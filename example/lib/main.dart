@@ -26,69 +26,154 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String barcode = 'Tap  to scan';
+  String barcode = '';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(' Scanner'),
+        title: Text('Barcode:$barcode'),
       ),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ElevatedButton(
-              child: const Text('Scan Barcode'),
-              onPressed: () async {
-                await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => AiBarcodeScanner(
-                      onDispose: () {
-                        /// This is called when the barcode scanner is disposed.
-                        /// You can write your own logic here.
-                        debugPrint("Barcode scanner disposed!");
-                      },
-                      hideGalleryButton: false,
-                      controller: MobileScannerController(
-                        detectionSpeed: DetectionSpeed.noDuplicates,
-                      ),
-                      onDetect: (BarcodeCapture capture) {
-                        /// The row string scanned barcode value
-                        final String? scannedValue =
-                            capture.barcodes.first.rawValue;
-                        debugPrint("Barcode scanned: $scannedValue");
+            // Expanded(
+            //   child: AiBarcodeScanner(
+            //     onDetect: (BarcodeCapture barcodeCapture) {
+            //       debugPrint(barcodeCapture.toString());
+            //     },
+            //   ),
+            // ),
+            Expanded(
+              child: AiBarcodeScanner(
+                onDispose: () {
+                  /// This is called when the barcode scanner is disposed.
+                  /// You can write your own logic here.
+                  debugPrint("Barcode scanner disposed!");
+                },
+                hideGalleryButton: false,
+                controller: MobileScannerController(
+                  detectionSpeed: DetectionSpeed.noDuplicates,
+                ),
+                onDetect: (BarcodeCapture capture) {
+                  /// The row string scanned barcode value
+                  final String? scannedValue = capture.barcodes.first.rawValue;
+                  debugPrint("Barcode scanned: $scannedValue");
+                  barcode = scannedValue ?? "";
+                  // value = scannedValue;
+                  setState(() {});
 
-                        /// The `Uint8List` image is only available if `returnImage` is set to `true`.
-                        final Uint8List? image = capture.image;
-                        debugPrint("Barcode image: $image");
+                  /// The `Uint8List` image is only available if `returnImage` is set to `true`.
+                  final Uint8List? image = capture.image;
+                  debugPrint("Barcode image: $image");
 
-                        /// row data of the barcode
-                        final Object? raw = capture.raw;
-                        debugPrint("Barcode raw: $raw");
+                  /// row data of the barcode
+                  final Object? raw = capture.raw;
+                  debugPrint("Barcode raw: $raw");
 
-                        /// List of scanned barcodes if any
-                        final List<Barcode> barcodes = capture.barcodes;
-                        debugPrint("Barcode list: $barcodes");
-                      },
-                      validator: (value) {
-                        if (value.barcodes.isEmpty) {
-                          return false;
-                        }
-                        if (!(value.barcodes.first.rawValue
-                                ?.contains('flutter.dev') ??
-                            false)) {
-                          return false;
-                        }
-                        return true;
-                      },
-                    ),
-                  ),
-                );
-              },
+                  /// List of scanned barcodes if any
+                  // final List<Barcode> barcodes = capture.barcodes;
+                  // debugPrint("Barcode list: $barcodes");
+                },
+              ),
             ),
-            Text(barcode),
+            // ElevatedButton(
+            //   child: const Text('Scan Barcode'),
+            //   onPressed: () async {
+            //     await Navigator.of(context).push(
+            //       MaterialPageRoute(builder: (context) {
+            //         return Barcode();
+            //         //   AiBarcodeScanner(
+            //         //   onDispose: () {
+            //         //     /// This is called when the barcode scanner is disposed.
+            //         //     /// You can write your own logic here.
+            //         //     debugPrint("Barcode scanner disposed!");
+            //         //   },
+            //         //   hideGalleryButton: false,
+            //         //   controller: MobileScannerController(
+            //         //     detectionSpeed: DetectionSpeed.noDuplicates,
+            //         //   ),
+            //         //   onDetect: (BarcodeCapture capture) {
+            //         //     /// The row string scanned barcode value
+            //         //     final String? scannedValue = capture.barcodes.first.rawValue;
+            //         //     debugPrint("Barcode scanned: $scannedValue");
+            //         //     // value = scannedValue;
+            //         //     setState(() {});
+            //         //
+            //         //     /// The `Uint8List` image is only available if `returnImage` is set to `true`.
+            //         //     final Uint8List? image = capture.image;
+            //         //     debugPrint("Barcode image: $image");
+            //         //
+            //         //     /// row data of the barcode
+            //         //     final Object? raw = capture.raw;
+            //         //     debugPrint("Barcode raw: $raw");
+            //         //
+            //         //     /// List of scanned barcodes if any
+            //         //     // final List<Barcode> barcodes = capture.barcodes;
+            //         //     // debugPrint("Barcode list: $barcodes");
+            //         //   },
+            //         // );
+            //       }),
+            //     );
+            //   },
+            // ),
+            // Text(barcode),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class Barcode extends StatefulWidget {
+  const Barcode({super.key});
+
+  @override
+  State<Barcode> createState() => _BarcodeState();
+}
+
+class _BarcodeState extends State<Barcode> {
+  String? value = "";
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        children: [
+          Text("Barcode Value${value}"),
+          Expanded(
+            child: AiBarcodeScanner(
+              onDispose: () {
+                /// This is called when the barcode scanner is disposed.
+                /// You can write your own logic here.
+                debugPrint("Barcode scanner disposed!");
+              },
+              hideGalleryButton: false,
+              controller: MobileScannerController(
+                detectionSpeed: DetectionSpeed.noDuplicates,
+              ),
+              onDetect: (BarcodeCapture capture) {
+                /// The row string scanned barcode value
+                final String? scannedValue = capture.barcodes.first.rawValue;
+                debugPrint("Barcode scanned: $scannedValue");
+                value = scannedValue;
+                setState(() {});
+
+                /// The `Uint8List` image is only available if `returnImage` is set to `true`.
+                final Uint8List? image = capture.image;
+                debugPrint("Barcode image: $image");
+
+                /// row data of the barcode
+                final Object? raw = capture.raw;
+                debugPrint("Barcode raw: $raw");
+
+                /// List of scanned barcodes if any
+                // final List<Barcode> barcodes = capture.barcodes;
+                // debugPrint("Barcode list: $barcodes");
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
